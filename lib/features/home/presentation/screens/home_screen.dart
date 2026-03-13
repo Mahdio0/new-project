@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../domain/entities/movie.dart';
 import '../../../../shared/widgets/error_widget.dart';
 import '../../../../shared/widgets/loading_widget.dart';
 import '../providers/movies_provider.dart';
@@ -52,52 +53,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: CustomScrollView(
-          controller: _scrollController,
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // App bar — inline, no separate SliverAppBar to stay full-OLED
-            const _HomeAppBar(),
+        child: RefreshIndicator(
+          // Pull-to-refresh resets page 1 of trending movies.
+          // Colour matches the OLED accent (mobile-color-system.md).
+          color: const Color(0xFFE50914),
+          backgroundColor: const Color(0xFF1A1A1A),
+          onRefresh: () => ref.read(trendingMoviesProvider.notifier).refresh(),
+          child: CustomScrollView(
+            controller: _scrollController,
+            // ClampingScrollPhysics chosen over Bouncing so the
+            // RefreshIndicator drag threshold is reached consistently on Android.
+            physics: const ClampingScrollPhysics(),
+            slivers: [
+              // App bar — inline, no separate SliverAppBar to stay full-OLED
+              const _HomeAppBar(),
 
-            // ─── Trending horizontal carousel ─────────────────────────────
-            const _SectionHeader(title: 'Trending This Week'),
-            trendingAsync.when(
-              data: (state) => _TrendingCarousel(movies: state.movies),
-              loading: () => const SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 260,
-                  child: TrendingSkeletonList(),
+              // ─── Trending horizontal carousel ───────────────────────────
+              const _SectionHeader(title: 'Trending This Week'),
+              trendingAsync.when(
+                data: (state) => _TrendingCarousel(movies: state.movies),
+                loading: () => const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 260,
+                    child: TrendingSkeletonList(),
+                  ),
+                ),
+                error: (err, _) => SliverToBoxAdapter(
+                  child: AppErrorWidget(
+                    message: err.toString(),
+                    onRetry: () => ref.invalidate(trendingMoviesProvider),
+                  ),
                 ),
               ),
-              error: (err, _) => SliverToBoxAdapter(
-                child: AppErrorWidget(
-                  message: err.toString(),
-                  onRetry: () => ref.invalidate(trendingMoviesProvider),
+
+              // ─── Top Rated section ──────────────────────────────────────
+              const _SectionHeader(title: 'Top Rated'),
+              _TopRatedSection(),
+
+              // ─── Trending vertical infinite list ────────────────────────
+              const _SectionHeader(title: 'Popular Now'),
+              trendingAsync.when(
+                data: (state) => _TrendingVerticalList(state: state),
+                loading: () => const SliverToBoxAdapter(child: AppLoadingWidget()),
+                error: (err, _) => SliverToBoxAdapter(
+                  child: InlineErrorWidget(
+                    onRetry: () => ref.invalidate(trendingMoviesProvider),
+                  ),
                 ),
               ),
-            ),
 
-            // ─── Top Rated section ────────────────────────────────────────
-            const _SectionHeader(title: 'Top Rated'),
-            _TopRatedSection(),
-
-            // ─── Trending vertical infinite list ─────────────────────────
-            const _SectionHeader(title: 'Popular Now'),
-            trendingAsync.when(
-              data: (state) => _TrendingVerticalList(state: state),
-              loading: () => const SliverToBoxAdapter(child: AppLoadingWidget()),
-              error: (err, _) => SliverToBoxAdapter(
-                child: InlineErrorWidget(
-                  onRetry: () => ref.invalidate(trendingMoviesProvider),
-                ),
+              // Bottom padding above nav bar
+              const SliverPadding(
+                padding: EdgeInsets.only(bottom: AppConstants.bottomNavHeight),
               ),
-            ),
-
-            // Bottom padding above nav bar
-            const SliverPadding(
-              padding: EdgeInsets.only(bottom: AppConstants.bottomNavHeight),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -177,7 +187,8 @@ class _SectionHeader extends StatelessWidget {
 
 class _TrendingCarousel extends StatelessWidget {
   const _TrendingCarousel({required this.movies});
-  final List movies;
+  // Typed list — avoids dynamic dispatch and matches the Movie entity contract.
+  final List<Movie> movies;
 
   @override
   Widget build(BuildContext context) {

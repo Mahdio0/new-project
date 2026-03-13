@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../../../features/watchlist/domain/entities/watchlist_movie.dart';
 import '../../../../features/watchlist/presentation/providers/watchlist_provider.dart';
 import '../../../../shared/widgets/cached_movie_image.dart';
@@ -30,12 +31,25 @@ class MovieDetailScreen extends ConsumerWidget {
     return PopScope(
       // Predictive back support (platform-android.md §5)
       canPop: true,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: detailAsync.when(
-          data: (movie) => _MovieDetailBody(movie: movie),
-          loading: () => const _DetailLoadingScreen(),
-          error: (err, _) => AppErrorWidget(
+      child: detailAsync.when(
+        data: (movie) => Scaffold(
+          backgroundColor: Colors.black,
+          body: _MovieDetailBody(movie: movie),
+        ),
+        loading: () => const _DetailLoadingScreen(),
+        error: (err, _) => Scaffold(
+          backgroundColor: Colors.black,
+          // Error state must always offer a way out (mobile-navigation.md).
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () => context.pop(),
+              tooltip: 'Back',
+            ),
+          ),
+          body: AppErrorWidget(
             message: err.toString(),
             onRetry: () => ref.invalidate(movieDetailProvider(movieId)),
           ),
@@ -53,7 +67,9 @@ class _MovieDetailBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    // sizeOf instead of size: only rebuilds when screen SIZE changes, not when
+    // any other MediaQueryData field changes (mobile-performance.md §2).
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isInWatchlist = ref.watch(isInWatchlistProvider(movie.id));
 
     return CustomScrollView(
@@ -251,12 +267,8 @@ class _MovieDetailBody extends ConsumerWidget {
 
     if (isInWatchlist) {
       watchlistNotifier.remove(movie.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Removed "${movie.title}" from watchlist'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      // Extension from core/utils/extensions.dart — avoids boilerplate
+      context.showSnackBar('Removed "${movie.title}" from watchlist');
     } else {
       watchlistNotifier.add(
         WatchlistMovie(
@@ -268,12 +280,7 @@ class _MovieDetailBody extends ConsumerWidget {
           addedAt: DateTime.now(),
         ),
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Added "${movie.title}" to watchlist'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      context.showSnackBar('Added "${movie.title}" to watchlist');
     }
   }
 }
@@ -283,20 +290,29 @@ class _DetailLoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          expandedHeight: 260,
-          pinned: true,
-          backgroundColor: Colors.black,
-          flexibleSpace: const FlexibleSpaceBar(
-            background: ColoredBox(color: Color(0xFF0D0D0D)),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 260,
+            pinned: true,
+            backgroundColor: Colors.black,
+            // Back button shown during loading so user isn't stranded.
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () => context.pop(),
+              tooltip: 'Back',
+            ),
+            flexibleSpace: const FlexibleSpaceBar(
+              background: ColoredBox(color: Color(0xFF0D0D0D)),
+            ),
           ),
-        ),
-        const SliverFillRemaining(
-          child: AppLoadingWidget(),
-        ),
-      ],
+          const SliverFillRemaining(
+            child: AppLoadingWidget(),
+          ),
+        ],
+      ),
     );
   }
 }
