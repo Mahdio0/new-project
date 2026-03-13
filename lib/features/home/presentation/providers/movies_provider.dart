@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/movie.dart';
+import '../../../../core/errors/app_exception.dart';
 import '../../../../services/api/movie_api_service.dart';
 
 // ────────────────────────────────────────────────────────────────
@@ -12,24 +13,28 @@ class MovieListState {
   const MovieListState({
     this.movies = const [],
     this.currentPage = 1,
+    this.totalPages = 1,
     this.isLoadingMore = false,
     this.hasReachedMax = false,
   });
 
   final List<Movie> movies;
   final int currentPage;
+  final int totalPages;
   final bool isLoadingMore;
   final bool hasReachedMax;
 
   MovieListState copyWith({
     List<Movie>? movies,
     int? currentPage,
+    int? totalPages,
     bool? isLoadingMore,
     bool? hasReachedMax,
   }) {
     return MovieListState(
       movies: movies ?? this.movies,
       currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
     );
@@ -37,14 +42,19 @@ class MovieListState {
 }
 
 /// Trending movies notifier — first page fetched on creation.
-/// Uses AsyncNotifier for clean loading/error/data states.
+/// Uses AsyncNotifier for clean loading/error/data states (Riverpod 2.0).
 class TrendingMoviesNotifier extends AutoDisposeAsyncNotifier<MovieListState> {
   @override
   Future<MovieListState> build() async {
-    final movies = await ref
+    final result = await ref
         .watch(movieApiServiceProvider)
         .getTrendingMovies(page: 1);
-    return MovieListState(movies: movies);
+    return MovieListState(
+      movies: result.items,
+      currentPage: result.page,
+      totalPages: result.totalPages,
+      hasReachedMax: result.hasReachedMax,
+    );
   }
 
   /// Load next page (called when user scrolls near the end of the list).
@@ -58,23 +68,22 @@ class TrendingMoviesNotifier extends AutoDisposeAsyncNotifier<MovieListState> {
 
     final nextPage = current.currentPage + 1;
     try {
-      final newMovies = await ref
+      final result = await ref
           .read(movieApiServiceProvider)
           .getTrendingMovies(page: nextPage);
 
-      if (newMovies.isEmpty) {
-        state = AsyncData(
-          current.copyWith(isLoadingMore: false, hasReachedMax: true),
-        );
-      } else {
-        state = AsyncData(
-          current.copyWith(
-            movies: [...current.movies, ...newMovies],
-            currentPage: nextPage,
-            isLoadingMore: false,
-          ),
-        );
-      }
+      state = AsyncData(
+        current.copyWith(
+          movies: [...current.movies, ...result.items],
+          currentPage: result.page,
+          totalPages: result.totalPages,
+          isLoadingMore: false,
+          hasReachedMax: result.hasReachedMax,
+        ),
+      );
+    } on AppException {
+      // Restore previous state — user can retry by scrolling again
+      state = AsyncData(current.copyWith(isLoadingMore: false));
     } catch (_) {
       state = AsyncData(current.copyWith(isLoadingMore: false));
     }
@@ -84,10 +93,15 @@ class TrendingMoviesNotifier extends AutoDisposeAsyncNotifier<MovieListState> {
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final movies = await ref
+      final result = await ref
           .read(movieApiServiceProvider)
           .getTrendingMovies(page: 1);
-      return MovieListState(movies: movies);
+      return MovieListState(
+        movies: result.items,
+        currentPage: result.page,
+        totalPages: result.totalPages,
+        hasReachedMax: result.hasReachedMax,
+      );
     });
   }
 }
@@ -97,12 +111,14 @@ final trendingMoviesProvider =
   TrendingMoviesNotifier.new,
 );
 
-/// Top-rated movies provider.
-final topRatedMoviesProvider = FutureProvider.autoDispose<List<Movie>>((ref) {
-  return ref.watch(movieApiServiceProvider).getTopRatedMovies();
+/// Top-rated movies provider (first page only — used as a secondary feed).
+final topRatedMoviesProvider = FutureProvider.autoDispose<List<Movie>>((ref) async {
+  final result = await ref.watch(movieApiServiceProvider).getTopRatedMovies();
+  return result.items;
 });
 
-/// Now-playing movies provider.
-final nowPlayingMoviesProvider = FutureProvider.autoDispose<List<Movie>>((ref) {
-  return ref.watch(movieApiServiceProvider).getNowPlayingMovies();
+/// Now-playing movies provider (first page only — used as a secondary feed).
+final nowPlayingMoviesProvider = FutureProvider.autoDispose<List<Movie>>((ref) async {
+  final result = await ref.watch(movieApiServiceProvider).getNowPlayingMovies();
+  return result.items;
 });

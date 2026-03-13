@@ -1,26 +1,29 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:movie_db/core/errors/app_exception.dart';
+import 'package:movie_db/core/constants/app_constants.dart';
+import 'package:movie_db/features/home/domain/entities/movie.dart';
 import 'package:movie_db/features/home/presentation/providers/movies_provider.dart';
 import 'package:movie_db/features/watchlist/domain/entities/watchlist_movie.dart';
-import 'package:movie_db/features/home/domain/entities/movie.dart';
-import 'package:movie_db/core/constants/app_constants.dart';
+import 'package:movie_db/services/api/paginated_result.dart';
 
 void main() {
   // ─── MovieListState ──────────────────────────────────────────────────────────
   group('MovieListState', () {
-    test('default state has empty movies and page 1', () {
+    test('default state has empty movies, page 1, and no max reached', () {
       const state = MovieListState();
       expect(state.movies, isEmpty);
       expect(state.currentPage, equals(1));
+      expect(state.totalPages, equals(1));
       expect(state.isLoadingMore, isFalse);
       expect(state.hasReachedMax, isFalse);
     });
 
     test('copyWith preserves unchanged fields', () {
-      const initial = MovieListState(currentPage: 3);
+      const initial = MovieListState(currentPage: 3, totalPages: 10);
       final updated = initial.copyWith(isLoadingMore: true);
       expect(updated.currentPage, equals(3));
+      expect(updated.totalPages, equals(10));
       expect(updated.isLoadingMore, isTrue);
       expect(updated.hasReachedMax, isFalse);
     });
@@ -31,6 +34,11 @@ void main() {
       final updated = initial.copyWith(movies: [movie]);
       expect(updated.movies.length, equals(1));
       expect(updated.movies.first.id, equals(1));
+    });
+
+    test('hasReachedMax true when set explicitly', () {
+      const state = MovieListState(hasReachedMax: true);
+      expect(state.hasReachedMax, isTrue);
     });
   });
 
@@ -53,6 +61,20 @@ void main() {
         popularity: 1.0,
       );
       expect(movie.releaseYear, equals('202'));
+    });
+
+    test('releaseYear handles empty string', () {
+      const movie = Movie(
+        id: 2,
+        title: 'No Date',
+        posterPath: null,
+        backdropPath: null,
+        overview: '',
+        voteAverage: 0.0,
+        releaseDate: '',
+        popularity: 0.0,
+      );
+      expect(movie.releaseYear, equals(''));
     });
   });
 
@@ -83,13 +105,116 @@ void main() {
     });
   });
 
+  // ─── PaginatedResult ─────────────────────────────────────────────────────────
+  group('PaginatedResult', () {
+    test('hasReachedMax is true when page equals totalPages', () {
+      const result = PaginatedResult<int>(
+        items: [1, 2, 3],
+        page: 5,
+        totalPages: 5,
+        totalResults: 100,
+      );
+      expect(result.hasReachedMax, isTrue);
+    });
+
+    test('hasReachedMax is false when more pages remain', () {
+      const result = PaginatedResult<int>(
+        items: [1, 2],
+        page: 3,
+        totalPages: 10,
+        totalResults: 200,
+      );
+      expect(result.hasReachedMax, isFalse);
+    });
+
+    test('isEmpty reflects empty items list', () {
+      const emptyResult = PaginatedResult<String>(
+        items: [],
+        page: 1,
+        totalPages: 1,
+        totalResults: 0,
+      );
+      expect(emptyResult.isEmpty, isTrue);
+    });
+
+    test('isFirstPage is true on page 1', () {
+      const result = PaginatedResult<String>(
+        items: ['a'],
+        page: 1,
+        totalPages: 3,
+        totalResults: 30,
+      );
+      expect(result.isFirstPage, isTrue);
+    });
+
+    test('isFirstPage is false on subsequent pages', () {
+      const result = PaginatedResult<String>(
+        items: ['b'],
+        page: 2,
+        totalPages: 3,
+        totalResults: 30,
+      );
+      expect(result.isFirstPage, isFalse);
+    });
+  });
+
+  // ─── AppException hierarchy ──────────────────────────────────────────────────
+  group('AppException', () {
+    test('NetworkException has correct userMessage', () {
+      const e = NetworkException();
+      expect(e, isA<AppException>());
+      expect(e.userMessage, contains('internet'));
+    });
+
+    test('TimeoutException is a subtype of AppException', () {
+      const e = TimeoutException();
+      expect(e, isA<AppException>());
+    });
+
+    test('UnauthorizedException userMessage is user-safe', () {
+      const e = UnauthorizedException();
+      expect(e.userMessage, isNot(contains('dart-define')));
+      expect(e.userMessage, contains('Authentication'));
+    });
+
+    test('NotFoundException userMessage is concise', () {
+      const e = NotFoundException();
+      expect(e.userMessage, equals('Content not found.'));
+    });
+
+    test('RateLimitException userMessage mentions waiting', () {
+      const e = RateLimitException();
+      expect(e.userMessage, contains('wait'));
+    });
+
+    test('ServerException is a subtype of AppException', () {
+      const e = ServerException();
+      expect(e, isA<AppException>());
+    });
+
+    test('ParseException is a subtype of AppException', () {
+      const e = ParseException();
+      expect(e, isA<AppException>());
+    });
+
+    test('UnknownException wraps a custom message', () {
+      const e = UnknownException('something weird');
+      expect(e.message, equals('something weird'));
+    });
+
+    test('toString includes runtimeType', () {
+      const e = NetworkException();
+      expect(e.toString(), startsWith('NetworkException'));
+    });
+  });
+
   // ─── AppConstants ────────────────────────────────────────────────────────────
   group('AppConstants', () {
-    test('minTouchTarget is 48dp', () {
+    test('minTouchTarget is 48dp (WCAG 2.5.5 / Material Design minimum)', () {
       expect(AppConstants.minTouchTarget, equals(48.0));
     });
 
-    test('spacing values follow 8dp grid', () {
+    test('spacing values follow 8dp baseline grid (platform-android.md)', () {
       expect(AppConstants.spacing8, equals(8.0));
       expect(AppConstants.spacing16, equals(16.0));
       expect(AppConstants.spacing24, equals(24.0));
@@ -98,6 +223,15 @@ void main() {
 
     test('bottom nav height is 80dp (Android Material 3 guideline)', () {
       expect(AppConstants.bottomNavHeight, equals(80.0));
+    });
+
+    test('pageSize is 20 (TMDB default page size)', () {
+      expect(AppConstants.pageSize, equals(20));
+    });
+
+    test('Hive box names are non-empty strings', () {
+      expect(AppConstants.watchlistBox, isNotEmpty);
+      expect(AppConstants.settingsBox, isNotEmpty);
     });
   });
 }
