@@ -159,22 +159,50 @@ flutter test
 
 ---
 
-## ⚙️ Phase 3 Strict Execution Laws (Acknowledged)
+## ✅ Implementation Principles (All Phases Complete)
 
-- ✅ **Performance:** `ListView.builder` / `SliverList` only. No `SingleChildScrollView + Column`. `const` constructors everywhere
-- ✅ **Touch targets:** All tappable elements ≥ 48dp (`AppConstants.minTouchTarget`)
-- ✅ **OLED/Battery:** True Black `#000000` backgrounds, `ThemeMode.dark` forced
-- ✅ **Predictive back:** `PopScope` on detail screens (Android 14+)
-- ✅ **Debugging:** Flutter DevTools + network profiler (no `print()`)
-- ✅ **Images:** `CachedNetworkImage` with `memCacheWidth` = 1.5× display size
-- ✅ **API:** Paginated requests (20 items/page), partial responses, offline watchlist
+### Performance
+- `ListView.builder` / `SliverList` with delegate — no eager list materialisation
+- `const` constructors on all static widgets
+- `CachedNetworkImage` with `memCacheWidth` = 1.5× display size
+- `MediaQuery.sizeOf` (not `MediaQuery.of(context).size`) to avoid spurious rebuilds
+- `itemExtent` on fixed-height lists for O(1) layout
+
+### Touch & UX
+- All tappable elements ≥ 48dp (`AppConstants.minTouchTarget`)
+- `ClampingScrollPhysics` on all `CustomScrollView` instances (Android convention)
+- `Dismissible` swipe-to-remove on Watchlist with undo SnackBar — no blocking dialog
+- Pull-to-refresh (`RefreshIndicator`) on Home feed
+
+### Visual / OLED
+- True Black `#000000` backgrounds (`ThemeMode.dark` forced)
+- Per-branch Scaffold: each `when()` state (data / loading / error) owns its own `Scaffold` with a back button — users are never stranded
+
+### Navigation
+- `PopScope` on detail screens (predictive back, Android 14+)
+- Explicit `leading:` `arrow_back_rounded` buttons on every stack screen
+- Invalid deep links fall back to Home — never crash
+
+### Offline
+- Watchlist reads directly from Hive on every build — zero network dependency
+- `WatchlistNotifier.build()` calls `WatchlistStorage.getAll()` synchronously
+
+### API
+- `AppException` sealed hierarchy — UI never catches raw `DioException`
+- Retry interceptor: 3 retries with exponential back-off (500 ms, 1 s, 2 s)
+- `PaginatedResult<T>` returns items + pagination metadata in one round-trip
+- `debugPrint()` only (silent in release builds)
 
 ---
 
 ## 🔑 TMDB API Key Security
 
 The API key in `lib/core/constants/api_constants.dart` is a **placeholder only**.  
-For production, move the key to:
-- A `.env` file (excluded from git via `.gitignore`)
-- A build-time `--dart-define=TMDB_API_KEY=...` flag
-- Obfuscated via `flutter_dotenv` package
+Provide your key at build time — never commit it to source control:
+
+```bash
+flutter run --dart-define=TMDB_API_KEY=your_actual_key_here
+flutter build apk --dart-define=TMDB_API_KEY=your_actual_key_here
+```
+
+The `.gitignore` already excludes `.env`, `.env.local`, and `lib/core/constants/secrets.dart` as safe alternatives for key storage.
