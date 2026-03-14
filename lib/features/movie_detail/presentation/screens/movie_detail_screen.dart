@@ -29,7 +29,7 @@ class MovieDetailScreen extends ConsumerWidget {
     final detailAsync = ref.watch(movieDetailProvider(movieId));
 
     return PopScope(
-      // Predictive back support (platform-android.md §5)
+      // Predictive back support
       canPop: true,
       child: detailAsync.when(
         data: (movie) => Scaffold(
@@ -68,7 +68,7 @@ class _MovieDetailBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // sizeOf instead of size: only rebuilds when screen SIZE changes, not when
-    // any other MediaQueryData field changes (mobile-performance.md §2).
+    // any other MediaQueryData field changes.
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isInWatchlist = ref.watch(isInWatchlistProvider(movie.id));
 

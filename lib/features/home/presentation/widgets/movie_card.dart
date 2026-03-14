@@ -8,7 +8,7 @@ import '../../../../shared/widgets/cached_movie_image.dart';
 /// Vertical poster card used in horizontal carousels.
 ///
 /// Touch target: card is full 140×220dp — satisfies 48dp minimum.
-/// const constructor: prevents unnecessary rebuilds (mobile-performance.md §3).
+/// const constructor: prevents unnecessary rebuilds.
 class MovieCard extends StatelessWidget {
   const MovieCard({
     super.key,
@@ -88,7 +88,7 @@ class MovieListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      // Ripple effect — Android Material convention (platform-android.md §7)
+      // Ripple effect — Android Material convention
       borderRadius: BorderRadius.circular(AppConstants.cardRadius),
       onTap: () => context.go('/movie/${movie.id}'),
       child: Container(

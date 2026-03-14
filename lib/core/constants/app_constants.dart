@@ -1,12 +1,12 @@
 /// App-wide constants.
-/// All spacing follows the Android 8dp baseline grid (platform-android.md).
+/// All spacing follows the Android 8dp baseline grid.
 class AppConstants {
   AppConstants._();
 
   // Touch targets — minimum 48dp per Material Design / WCAG
   static const double minTouchTarget = 48.0;
 
-  // Spacing — 8dp baseline grid (platform-android.md)
+  // Spacing — 8dp baseline grid
   static const double spacing4 = 4.0;
   static const double spacing8 = 8.0;
   static const double spacing12 = 12.0;
@@ -23,10 +23,10 @@ class AppConstants {
   static const double movieCardWidth = 140.0;
   static const double movieListItemHeight = 120.0;
 
-  // Bottom nav height (platform-android.md — 80dp)
+  // Bottom nav height — 80dp
   static const double bottomNavHeight = 80.0;
 
-  // Animation durations (mobile-performance.md)
+  // Animation durations
   static const Duration microDuration = Duration(milliseconds: 150);
   static const Duration standardDuration = Duration(milliseconds: 250);
   static const Duration pageDuration = Duration(milliseconds: 350);

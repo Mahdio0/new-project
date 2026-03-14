@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// OLED-optimized dark theme.
-/// Background: True Black #000000 — maximum OLED battery savings (mobile-color-system.md).
+/// Background: True Black #000000 — maximum OLED battery savings.
 /// Surfaces: #0D0D0D / #1A1A1A — slight elevation, no harsh edges.
 /// Text: #E0E0E0 — not pure white (reduces eye strain).
 class AppTheme {
@@ -60,7 +60,7 @@ class AppTheme {
           ),
         ),
 
-        // BottomNavigationBar — true black, 80dp height (platform-android.md)
+        // BottomNavigationBar — true black, 80dp height
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: _background,
           selectedItemColor: _primary,
@@ -90,7 +90,7 @@ class AppTheme {
           height: 80,
         ),
 
-        // Cards — dark surface, 12dp corner radius (platform-android.md)
+        // Cards — dark surface, 12dp corner radius
         cardTheme: CardThemeData(
           color: _surface,
           surfaceTintColor: Colors.transparent,
@@ -110,7 +110,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
 
-        // Text theme — Roboto is Android default (platform-android.md)
+        // Text theme — Roboto is Android default
         textTheme: const TextTheme(
           displayLarge: TextStyle(color: _textPrimary, fontSize: 57, fontWeight: FontWeight.w300),
           displayMedium: TextStyle(color: _textPrimary, fontSize: 45, fontWeight: FontWeight.w300),

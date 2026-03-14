@@ -214,7 +214,7 @@ void main() {
       expect(AppConstants.minTouchTarget, equals(48.0));
     });
 
-    test('spacing values follow 8dp baseline grid (platform-android.md)', () {
+    test('spacing values follow 8dp baseline grid', () {
       expect(AppConstants.spacing8, equals(8.0));
       expect(AppConstants.spacing16, equals(16.0));
       expect(AppConstants.spacing24, equals(24.0));

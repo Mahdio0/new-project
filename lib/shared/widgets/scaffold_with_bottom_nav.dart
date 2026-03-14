@@ -25,7 +25,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
       // Each branch keeps its Navigator alive when off-screen.
       body: navigationShell,
 
-      // Material 3 NavigationBar — 80dp height, ripple on tap (platform-android.md)
+      // Material 3 NavigationBar — 80dp height, ripple on tap
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) {
@@ -42,7 +42,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'Home',
-            // Semantic label for TalkBack (platform-android.md §9)
+            // Semantic label for TalkBack
             tooltip: 'Home — Trending movies',
           ),
           NavigationDestination(

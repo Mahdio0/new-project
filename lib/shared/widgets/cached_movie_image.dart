@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/api_constants.dart';
 
 /// OLED-safe cached poster image with memory limits.
-/// Mobile performance rule: Always constrain memCacheWidth/Height (mobile-performance.md §3).
+/// Mobile performance rule: Always constrain memCacheWidth/Height.
 class MoviePosterImage extends StatelessWidget {
   const MoviePosterImage({
     super.key,
@@ -29,7 +29,7 @@ class MoviePosterImage extends StatelessWidget {
             width: width,
             height: height,
             fit: fit,
-            // Limit decoded image in memory to 2× display size (mobile-performance.md §3)
+            // Limit decoded image in memory to 2× display size
             memCacheWidth: (width * MediaQuery.of(context).devicePixelRatio * 1.5).toInt(),
             memCacheHeight: (height * MediaQuery.of(context).devicePixelRatio * 1.5).toInt(),
             placeholder: (_, __) => const _PosterPlaceholder(),
