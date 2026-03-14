@@ -1,0 +1,15 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - avoid_print
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_fields
+    - prefer_final_in_for_each
+    - prefer_final_locals
+    - use_super_parameters
+    - unnecessary_const
+    - sort_child_properties_last
+    - sized_box_for_whitespace
+    - use_key_in_widget_constructors

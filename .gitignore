@@ -1,0 +1,41 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.iml
+
+# Android build
+android/.gradle/
+android/captures/
+android/local.properties
+android/key.properties
+android/app/debug.keystore
+android/app/release.keystore
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Secrets (NEVER commit API keys)
+.env
+.env.local
+lib/core/constants/secrets.dart
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Coverage
+coverage/
+
+# Dependencies
+pubspec.lock

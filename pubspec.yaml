@@ -1,0 +1,43 @@
+name: movie_db
+description: A Flutter Movie Database App — trending movies, watchlist, and reviews.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # HTTP
+  dio: ^5.4.3+1
+
+  # Local Storage (offline watchlist)
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Image Caching (OLED-safe placeholder, memory-limited)
+  cached_network_image: ^3.3.1
+
+  # Icons
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Code Generation (for Hive TypeAdapters when re-generating)
+  build_runner: ^2.4.9
+  hive_generator: ^2.0.1
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
