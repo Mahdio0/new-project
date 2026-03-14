@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/error_widget.dart';
@@ -50,15 +51,21 @@ class _ReviewsScreenState extends ConsumerState<ReviewsScreen> {
       body: SafeArea(
         child: CustomScrollView(
           controller: _scrollController,
-          physics: const BouncingScrollPhysics(),
+          // ClampingScrollPhysics — Android convention, matches HomeScreen.
+          physics: const ClampingScrollPhysics(),
           slivers: [
-            // App bar
+            // App bar — explicit back button (consistent with Phase 4 pattern)
             SliverAppBar(
               pinned: true,
               backgroundColor: Colors.black,
               title: const Text('Reviews'),
               elevation: 0,
               scrolledUnderElevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => context.pop(),
+                tooltip: 'Back',
+              ),
             ),
 
             reviewsAsync.when(

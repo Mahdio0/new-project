@@ -22,7 +22,8 @@ class WatchlistScreen extends ConsumerWidget {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
+          // ClampingScrollPhysics — Android convention, matches HomeScreen.
+          physics: const ClampingScrollPhysics(),
           slivers: [
             // App bar
             SliverPadding(
@@ -89,14 +90,12 @@ class _WatchlistItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Dismissible(
-      // Swipe-to-remove (Android convention — visible delete button also available)
+      // Swipe-to-remove (Android convention).
+      // No confirmDismiss dialog — the undo SnackBar is the recovery path
+      // (touch-psychology.md: avoid double confirmation for reversible actions).
       key: ValueKey(movie.id),
       direction: DismissDirection.endToStart,
       background: const _DismissBackground(),
-      confirmDismiss: (_) async {
-        // Confirm on dismiss (touch-psychology.md — destructive action)
-        return await _confirmRemove(context);
-      },
       onDismissed: (_) {
         ref.read(watchlistProvider.notifier).remove(movie.id);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -169,16 +168,25 @@ class _WatchlistItem extends ConsumerWidget {
                   ],
                 ),
               ),
-              // Delete button — 48dp touch target
+              // Delete button — 48dp touch target, immediate remove + undo
               SizedBox(
                 width: 48,
                 height: 48,
                 child: IconButton(
-                  onPressed: () async {
-                    final confirmed = await _confirmRemove(context);
-                    if (confirmed == true) {
-                      ref.read(watchlistProvider.notifier).remove(movie.id);
-                    }
+                  onPressed: () {
+                    ref.read(watchlistProvider.notifier).remove(movie.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Removed "${movie.title}"'),
+                        behavior: SnackBarBehavior.floating,
+                        action: SnackBarAction(
+                          label: 'UNDO',
+                          onPressed: () {
+                            ref.read(watchlistProvider.notifier).add(movie);
+                          },
+                        ),
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.bookmark_remove_rounded,
                       color: Color(0xFFCF6679), size: 22),
@@ -188,28 +196,6 @@ class _WatchlistItem extends ConsumerWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Future<bool?> _confirmRemove(BuildContext context) {
-    return showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text('Remove from Watchlist?'),
-        content: Text('Remove "${movie.title}" from your watchlist?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFCF6679)),
-            child: const Text('Remove'),
-          ),
-        ],
       ),
     );
   }
@@ -254,7 +240,7 @@ class _EmptyWatchlist extends StatelessWidget {
             ),
             const SizedBox(height: AppConstants.spacing8),
             Text(
-              'Tap the bookmark icon on any movie\nto save it for later.',
+              'Tap the bookmark icon on any movie to save it for later. Go explore!',
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
