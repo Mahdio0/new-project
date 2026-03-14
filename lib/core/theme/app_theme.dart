@@ -91,7 +91,7 @@ class AppTheme {
         ),
 
         // Cards — dark surface, 12dp corner radius (platform-android.md)
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: _surface,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
