@@ -4,7 +4,7 @@ import '../../core/constants/app_constants.dart';
 import '../../features/watchlist/domain/entities/watchlist_movie.dart';
 
 /// Hive initialisation and box accessor.
-/// Offline-first watchlist storage (decision-trees.md §4 — structured local data).
+/// Offline-first watchlist storage using structured local data.
 class HiveStorage {
   HiveStorage._();
 

@@ -14,7 +14,7 @@ import '../providers/movie_detail_provider.dart';
 
 /// Movie Detail Screen — full movie info with watchlist action.
 ///
-/// Architecture notes (mobile-navigation.md):
+/// Architecture notes:
 /// - Entered via GoRouter stack push: /movie/:id
 /// - Back: GoRouter pops back to previous route (Home or Watchlist)
 /// - PopScope handles Android predictive back (Android 14+)
@@ -39,7 +39,7 @@ class MovieDetailScreen extends ConsumerWidget {
         loading: () => const _DetailLoadingScreen(),
         error: (err, _) => Scaffold(
           backgroundColor: Colors.black,
-          // Error state must always offer a way out (mobile-navigation.md).
+          // Error state must always offer a way out.
           appBar: AppBar(
             backgroundColor: Colors.black,
             elevation: 0,
@@ -89,7 +89,7 @@ class _MovieDetailBody extends ConsumerWidget {
             // 48dp touch target enforced by iconButtonTheme in AppTheme
           ),
           actions: [
-            // Watchlist toggle — 48dp button (touch-psychology.md)
+            // Watchlist toggle — 48dp button
             IconButton(
               onPressed: () => _toggleWatchlist(context, ref, isInWatchlist),
               icon: Icon(
@@ -236,7 +236,7 @@ class _MovieDetailBody extends ConsumerWidget {
 
               const SizedBox(height: AppConstants.spacing24),
 
-              // Reviews button — 48dp minimum height (touch-psychology.md)
+              // Reviews button — 48dp minimum height
               SizedBox(
                 height: 48,
                 child: OutlinedButton.icon(

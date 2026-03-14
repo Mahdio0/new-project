@@ -139,7 +139,7 @@ class _HomeAppBar extends StatelessWidget {
                   ),
             ),
             const Spacer(),
-            // Search icon — 48dp touch target (touch-psychology.md)
+            // Search icon — 48dp touch target
             IconButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(

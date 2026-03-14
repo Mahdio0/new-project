@@ -92,7 +92,7 @@ class _WatchlistItem extends ConsumerWidget {
     return Dismissible(
       // Swipe-to-remove (Android convention).
       // No confirmDismiss dialog — the undo SnackBar is the recovery path
-      // (touch-psychology.md: avoid double confirmation for reversible actions).
+      // Avoid double confirmation for reversible actions.
       key: ValueKey(movie.id),
       direction: DismissDirection.endToStart,
       background: const _DismissBackground(),

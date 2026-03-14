@@ -3,7 +3,7 @@
 class AppConstants {
   AppConstants._();
 
-  // Touch targets — minimum 48dp per Material Design / WCAG (touch-psychology.md)
+  // Touch targets — minimum 48dp per Material Design / WCAG
   static const double minTouchTarget = 48.0;
 
   // Spacing — 8dp baseline grid (platform-android.md)

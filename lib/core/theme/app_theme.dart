@@ -141,7 +141,7 @@ class AppTheme {
 
         iconButtonTheme: IconButtonThemeData(
           style: IconButton.styleFrom(
-            minimumSize: const Size(48, 48), // 48dp touch target (touch-psychology.md)
+            minimumSize: const Size(48, 48), // 48dp touch target
             iconSize: 24,
           ),
         ),

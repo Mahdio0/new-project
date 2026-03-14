@@ -2,7 +2,7 @@
 ///
 /// All service-layer errors are caught and re-thrown as one of these subtypes.
 /// The UI layer only ever handles [AppException] — it never sees raw [DioException]
-/// or Dart I/O errors. This enforces clean layer separation (flut_app_TEMPLATE.md).
+/// or Dart I/O errors. This enforces clean layer separation.
 ///
 /// Usage:
 /// ```dart

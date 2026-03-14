@@ -29,7 +29,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) {
-          // Per mobile-navigation.md: tap on already-selected tab scrolls to top
+          // Tap on already-selected tab scrolls to top
           if (navigationShell.currentIndex == index) {
             // Tab already selected — pop stack to root of this branch
             navigationShell.goBranch(index, initialLocation: true);
