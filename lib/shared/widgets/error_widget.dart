@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Generic error display with retry action.
-/// Mobile rule: Never show a dead end — always provide retry path (SKILL.md §4).
+/// Always provides a retry path so the user is never stranded.
 class AppErrorWidget extends StatelessWidget {
   const AppErrorWidget({
     super.key,
@@ -40,7 +40,7 @@ class AppErrorWidget extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 24),
-            // 48dp touch target — Mobile rule (touch-psychology.md)
+            // 48dp minimum touch target
             SizedBox(
               height: 48,
               child: ElevatedButton.icon(

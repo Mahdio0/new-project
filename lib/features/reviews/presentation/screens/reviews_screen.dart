@@ -54,7 +54,7 @@ class _ReviewsScreenState extends ConsumerState<ReviewsScreen> {
           // ClampingScrollPhysics — Android convention, matches HomeScreen.
           physics: const ClampingScrollPhysics(),
           slivers: [
-            // App bar — explicit back button (consistent with Phase 4 pattern)
+            // App bar — explicit back button
             SliverAppBar(
               pinned: true,
               backgroundColor: Colors.black,

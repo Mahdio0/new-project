@@ -7,8 +7,8 @@ import '../../../../shared/widgets/cached_movie_image.dart';
 
 /// Vertical poster card used in horizontal carousels.
 ///
-/// Touch target: card is full 140×220dp — satisfies 48dp minimum (touch-psychology.md).
-/// const constructor: prevents unnecessary rebuilds (mobile-performance.md §3).
+/// Touch target: card is full 140×220dp — satisfies 48dp minimum.
+/// const constructor: prevents unnecessary rebuilds.
 class MovieCard extends StatelessWidget {
   const MovieCard({
     super.key,
@@ -74,7 +74,7 @@ class MovieCard extends StatelessWidget {
 }
 
 /// Horizontal list item used in the "now playing" vertical feed.
-/// Height: 120dp — satisfies 48dp touch minimum (touch-psychology.md).
+/// Height: 120dp — satisfies 48dp touch minimum.
 class MovieListItem extends StatelessWidget {
   const MovieListItem({
     super.key,
@@ -88,7 +88,7 @@ class MovieListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      // Ripple effect — Android Material convention (platform-android.md §7)
+      // Ripple effect — Android Material convention
       borderRadius: BorderRadius.circular(AppConstants.cardRadius),
       onTap: () => context.go('/movie/${movie.id}'),
       child: Container(
@@ -155,7 +155,7 @@ class MovieListItem extends StatelessWidget {
                 ],
               ),
             ),
-            // 48dp chevron touch area (touch-psychology.md)
+            // 48dp chevron touch area
             const SizedBox(
               width: 48,
               height: 48,

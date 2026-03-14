@@ -15,7 +15,7 @@ class MovieDbApp extends ConsumerWidget {
       title: 'Movie DB',
       debugShowCheckedModeBanner: false,
 
-      // OLED dark mode — True Black #000000 (mobile-color-system.md)
+      // OLED dark mode — True Black #000000
       theme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
 

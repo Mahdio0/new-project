@@ -51,7 +51,7 @@ class MovieApiService {
 
   /// Full-text search against the TMDB movie catalogue.
   /// Returns an empty [PaginatedResult] immediately for blank queries to avoid
-  /// a wasted network request (mobile-backend.md §3 — no unnecessary traffic).
+  /// a wasted network request (no unnecessary traffic).
   Future<PaginatedResult<MovieModel>> searchMovies(
     String query, {
     int page = 1,

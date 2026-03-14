@@ -10,10 +10,10 @@ import '../../core/errors/app_exception.dart';
 /// Responsibilities:
 ///   1. Attach `api_key` and `X-Platform` headers to every request.
 ///   2. Retry transient failures (network blips, 5xx) up to [_maxRetries] times
-///      with exponential back-off — critical for mobile (mobile-backend.md §7).
+///      with exponential back-off — critical for mobile.
 ///   3. Map [DioException] → typed [AppException] so the rest of the app never
-///      catches raw Dio internals (flut_app_TEMPLATE.md — clean layer contract).
-///   4. Log requests/responses to Flutter DevTools console (mobile-debugging.md).
+///      catches raw Dio internals (clean layer contract).
+///   4. Log requests/responses to Flutter DevTools console.
 ///      Rule: Never use print() — use debugPrint(), which is silent in release.
 final apiClientProvider = Provider<Dio>((ref) {
   final dio = Dio(
@@ -33,7 +33,7 @@ final apiClientProvider = Provider<Dio>((ref) {
     InterceptorsWrapper(
       onRequest: (options, handler) {
         options.queryParameters['api_key'] = ApiConstants.tmdbApiKey;
-        // Helps TMDB analytics & server-side monitoring (mobile-backend.md §9)
+        // Helps TMDB analytics & server-side monitoring
         options.headers['X-Platform'] = 'android';
         handler.next(options);
       },

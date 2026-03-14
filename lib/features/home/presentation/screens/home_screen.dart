@@ -10,7 +10,7 @@ import '../widgets/movie_card.dart';
 
 /// Home Screen — Trending + Top Rated + Now Playing feeds.
 ///
-/// Performance rules applied (mobile-performance.md):
+/// Performance rules applied:
 /// - NEVER SingleChildScrollView + Column → using CustomScrollView + SliverList
 /// - Each horizontal carousel uses ListView.builder (lazy, not eager)
 /// - const constructors on all static widgets
@@ -55,7 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SafeArea(
         child: RefreshIndicator(
           // Pull-to-refresh resets page 1 of trending movies.
-          // Colour matches the OLED accent (mobile-color-system.md).
+          // Colour matches the OLED accent.
           color: const Color(0xFFE50914),
           backgroundColor: const Color(0xFF1A1A1A),
           onRefresh: () => ref.read(trendingMoviesProvider.notifier).refresh(),
@@ -139,7 +139,7 @@ class _HomeAppBar extends StatelessWidget {
                   ),
             ),
             const Spacer(),
-            // Search icon — 48dp touch target (touch-psychology.md)
+            // Search icon — 48dp touch target
             IconButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -195,7 +195,7 @@ class _TrendingCarousel extends StatelessWidget {
     return SliverToBoxAdapter(
       child: SizedBox(
         height: 260,
-        // ListView.builder — lazy rendering, NOT map().toList() (mobile-performance.md)
+        // ListView.builder — lazy rendering, NOT map().toList()
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacing16),
@@ -246,7 +246,7 @@ class _TopRatedSection extends ConsumerWidget {
 }
 
 /// Vertical list of trending movies with infinite scroll indicator.
-/// SliverList — virtualized, not eager (mobile-performance.md §3).
+/// SliverList — virtualized, not eager.
 class _TrendingVerticalList extends StatelessWidget {
   const _TrendingVerticalList({required this.state});
   final MovieListState state;

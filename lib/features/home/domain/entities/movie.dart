@@ -1,5 +1,5 @@
 /// Core movie entity used throughout the app.
-/// Minimal fields needed for list display (bandwidth efficiency — mobile-backend.md §3).
+/// Minimal fields needed for list display (bandwidth efficiency).
 class Movie {
   const Movie({
     required this.id,

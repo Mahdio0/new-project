@@ -25,11 +25,11 @@ class ScaffoldWithBottomNav extends StatelessWidget {
       // Each branch keeps its Navigator alive when off-screen.
       body: navigationShell,
 
-      // Material 3 NavigationBar — 80dp height, ripple on tap (platform-android.md)
+      // Material 3 NavigationBar — 80dp height, ripple on tap
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) {
-          // Per mobile-navigation.md: tap on already-selected tab scrolls to top
+          // Tap on already-selected tab scrolls to top
           if (navigationShell.currentIndex == index) {
             // Tab already selected — pop stack to root of this branch
             navigationShell.goBranch(index, initialLocation: true);
@@ -42,7 +42,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'Home',
-            // Semantic label for TalkBack (platform-android.md §9)
+            // Semantic label for TalkBack
             tooltip: 'Home — Trending movies',
           ),
           NavigationDestination(

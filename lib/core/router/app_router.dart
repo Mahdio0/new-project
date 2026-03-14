@@ -1,4 +1,4 @@
-// PHASE 2 — NAVIGATION SKELETON (mobile-navigation.md)
+// Navigation skeleton
 //
 // Architecture Decision:
 //   - 2 top-level sections (Home, Watchlist) → Bottom Navigation Bar (Android Material 3)
@@ -9,9 +9,9 @@
 //   GoRouter's StatefulShellRoute + IndexedStack maintains each tab's widget tree.
 //   When switching tabs, IndexedStack keeps the previous tab's widget alive (offstage=false).
 //   This ensures scroll positions, loaded data, and sub-routes survive tab switches.
-//   Rule from mobile-navigation.md: "Never reset tab stack on switch."
+//   Rule: "Never reset tab stack on switch."
 //
-// Deep Links (planned from day one — mobile-navigation.md §6):
+// Deep Links:
 //   /                     → Home tab (trending movies)
 //   /movie/:id            → Movie detail (stack push from Home tab)
 //   /movie/:id/reviews    → Reviews (stack push from Movie detail)
@@ -108,7 +108,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
 
-    // Fallback for invalid deep links — never crash (mobile-navigation.md §6)
+    // Fallback for invalid deep links — never crash
     errorBuilder: (context, state) => Scaffold(
       backgroundColor: Colors.black,
       body: Center(
